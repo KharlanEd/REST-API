@@ -64,21 +64,8 @@ router.post('/', async (req, res, next) => {
 
 })
 
-router.patch('/', async (req, res, next) => {
-  try{
-    const {error} = updateFavoriteSchema.validate(req.body)
-    if(error) {
-      throw HttpError(400, error.message)
-  }
-  const result = await Contact.create(req.body)
-  res.status(201).json(result)
 
-  }
-  catch(error){
-    next(error)
-  }
 
-})
 
 router.delete('/:contactId', async (req, res, next) => {
   try{
@@ -98,6 +85,24 @@ router.delete('/:contactId', async (req, res, next) => {
 
 router.put('/:contactId', async (req, res, next) => {
   try{
+    const {contactId} = req.params;
+    const result = await Contact.findByIdAndUpdate(contactId, req.body);
+  if (!result) {
+    throw HttpError(404, `Contact with ${contactId} not found`);
+  }
+  res.json(result);
+  }
+  catch(error){
+    next(error)
+  }
+})
+
+router.patch('/:contactId/favorite', async (req, res, next) => {
+  try{
+    const {error} = updateFavoriteSchema.validate(req.body)
+    if(error) {
+      throw HttpError(400, error.message)
+  }
     const {contactId} = req.params;
     const result = await Contact.findByIdAndUpdate(contactId, req.body);
   if (!result) {
