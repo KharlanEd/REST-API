@@ -2,19 +2,30 @@ const express = require('express')
 const Joi = require("joi");
 const router = express.Router()
 
-const contacstService = require('../../models/contacts')
+
+const {Contact} = require('../../models/contacts')
+
+
 
 const {HttpError}= require('../../helpers')
 
 const contactAddSchema = Joi.object({
   name: Joi.string().required(),
-  email: Joi.string().required(),
-  phone: Joi.string().required()
+  email: Joi.string(),
+  phone: Joi.string(),
+  favorite: Joi.boolean(),
+
 })
+
+const updateFavoriteSchema = Joi.object({
+  favorite: Joi.boolean()
+    .required()
+    .messages({ "any.required": "Missing field favorite" }),
+});
 
 router.get('/', async (req, res, next) => {
   try{
-    const result = await contacstService.listContacts()
+    const result = await Contact.find({},"name phone")
     res.json(result)
   }
   catch(error){
@@ -24,7 +35,7 @@ router.get('/', async (req, res, next) => {
 router.get('/:contactId', async (req, res, next) => {
   try{
     const {contactId}= req.params
-    const result = await contacstService.getContactById(contactId)
+    const result = await Contact.findById(contactId)
     if(!result){
      throw HttpError(404, `Contact with ${contactId} not found`)
     }
@@ -43,7 +54,23 @@ router.post('/', async (req, res, next) => {
     if(error) {
       throw HttpError(400, error.message)
   }
-  const result = await contacstService.addContact(req.body)
+  const result = await Contact.create(req.body)
+  res.status(201).json(result)
+
+  }
+  catch(error){
+    next(error)
+  }
+
+})
+
+router.patch('/', async (req, res, next) => {
+  try{
+    const {error} = updateFavoriteSchema.validate(req.body)
+    if(error) {
+      throw HttpError(400, error.message)
+  }
+  const result = await Contact.create(req.body)
   res.status(201).json(result)
 
   }
@@ -56,7 +83,7 @@ router.post('/', async (req, res, next) => {
 router.delete('/:contactId', async (req, res, next) => {
   try{
     const {contactId} = req.params;
-    const result = await contacstService.removeContact(contactId)
+    const result = await Contact.findByIdAndDelete(contactId)
     if(!result){
       throw HttpError(404, `Contact with ${contactId} not found`)
      }
@@ -72,7 +99,7 @@ router.delete('/:contactId', async (req, res, next) => {
 router.put('/:contactId', async (req, res, next) => {
   try{
     const {contactId} = req.params;
-    const result = await contacstService.updateContact(contactId, req.body);
+    const result = await Contact.findByIdAndUpdate(contactId, req.body);
   if (!result) {
     throw HttpError(404, `Contact with ${contactId} not found`);
   }
