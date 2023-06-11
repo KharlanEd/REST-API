@@ -1,8 +1,8 @@
 const express = require('express');
-const {validateBody, autenticate} = require('../../middlewares');
-const {schemas} = require('../../models/users')
-const ctrl = require('../../controllers/auth-controllers')
-const isValidIdSubscription = require('../../middlewares')
+const {validateBody, autenticate,upload} = require('../../middlewares');
+const {schemas} = require('../../models/user');
+const ctrl = require('../../controllers/auth-controllers');
+const {isValidIdSubscription} = require('../../middlewares');
 
 const router = express.Router();
 
@@ -12,6 +12,13 @@ router.post("/register", validateBody(schemas.registerSchema),ctrl.register)
 router.post("/login",validateBody(schemas.loginSchema),ctrl.login)
 
 router.get("/current",autenticate,ctrl.getCurrent)
+
+router.patch(
+  "/avatars",
+  autenticate,
+  upload.single("avatar"),
+  ctrl.updateAvatar
+);
 
 router.patch(
     "/:subscription",
