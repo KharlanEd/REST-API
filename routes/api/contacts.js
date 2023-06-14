@@ -1,7 +1,7 @@
 const express = require('express')
 
 const router = express.Router()
-const {validateBody,isValidId,autenticate} = require('../../middlewares')
+const {validateBody,isValidId,autenticate,upload} = require('../../middlewares')
 const contactsController = require("../../controllers/contacts-controllers");
 const {schemas} = require('../../models/contact')
 
@@ -16,6 +16,7 @@ router.get(
 
 router.post(
   "/",
+  upload.single('avatarURL'),
   autenticate,
   validateBody(schemas.addSchema),
   contactsController.addNewContact
