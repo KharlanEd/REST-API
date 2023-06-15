@@ -4,6 +4,7 @@ const autenticate = require('./autenticate')
 const ctrlWrapper = require('./ctrlWrapper')
 const isValidIdSubscription = require('./isValidIdSubscription')
 const upload = require('./upload')
+const sendEmail = require('./sendEmail')
 
 module.exports = {
     isValidId,
@@ -11,6 +12,7 @@ module.exports = {
     autenticate,
     ctrlWrapper,
     isValidIdSubscription,
-    upload
+    upload,
+    sendEmail
    
 }
